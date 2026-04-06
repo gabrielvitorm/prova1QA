@@ -25,8 +25,8 @@ import org.springframework.data.domain.Sort;
 
 import br.com.prova1qa.api.dtos.AlunoRequest;
 import br.com.prova1qa.api.dtos.AlunoResponse;
-import br.com.prova1qa.api.exception.RecursoNaoEncontradoException;
-import br.com.prova1qa.api.exception.RegraDeNegocioException;
+import br.com.prova1qa.api.exception.EntidadeNaoEncontradaException;
+import br.com.prova1qa.api.exception.ViolacaoRegraDeNegocioException;
 import br.com.prova1qa.api.mapper.AlunoMapper;
 import br.com.prova1qa.api.model.Aluno;
 import br.com.prova1qa.api.repository.AlunoRepository;
@@ -50,7 +50,7 @@ class AlunoServiceImplTest {
         AlunoRequest request = criarRequestValidoParaPrimeiroSemestre();
         AlunoResponse responseEsperado = criarResponse(
                 1L,
-                "Gabriel Vitor Chaves",
+                "Gabriel Vitor Martins",
                 "52998224725",
                 "01001000",
                 LocalDate.of(2000, 5, 10),
@@ -238,14 +238,14 @@ class AlunoServiceImplTest {
     void deveLancarExcecaoQuandoBuscarAlunoNaoExistir() {
         when(alunoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        RecursoNaoEncontradoException exception = assertThrows(
-                RecursoNaoEncontradoException.class,
+        EntidadeNaoEncontradaException exception = assertThrows(
+                EntidadeNaoEncontradaException.class,
                 () -> alunoService.buscarPorId(99L));
 
         verify(alunoRepository).findById(99L);
         verifyNoMoreInteractions(alunoRepository);
         verifyNoInteractions(alunoMapper);
-        assertEquals("Aluno com id 99 nao encontrado", exception.getMessage());
+        assertEquals("Aluno com ID 99 não encontrado.", exception.getMessage());
     }
 
     @Test
@@ -287,14 +287,14 @@ class AlunoServiceImplTest {
         AlunoRequest request = criarRequestValidoParaPrimeiroSemestre();
         when(alunoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RecursoNaoEncontradoException exception = assertThrows(
-                RecursoNaoEncontradoException.class,
+        EntidadeNaoEncontradaException exception = assertThrows(
+                EntidadeNaoEncontradaException.class,
                 () -> alunoService.atualizar(1L, request));
 
         verify(alunoRepository).findById(1L);
         verify(alunoRepository, never()).save(any(Aluno.class));
         verifyNoInteractions(alunoMapper);
-        assertEquals("Aluno com id 1 nao encontrado", exception.getMessage());
+        assertEquals("Aluno com ID 1 não encontrado.", exception.getMessage());
     }
 
     @Test
@@ -314,14 +314,14 @@ class AlunoServiceImplTest {
     void deveLancarExcecaoQuandoExcluirAlunoNaoExistir() {
         when(alunoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RecursoNaoEncontradoException exception = assertThrows(
-                RecursoNaoEncontradoException.class,
+        EntidadeNaoEncontradaException exception = assertThrows(
+                EntidadeNaoEncontradaException.class,
                 () -> alunoService.excluir(1L));
 
         verify(alunoRepository).findById(1L);
         verify(alunoRepository, never()).delete(any(Aluno.class));
         verifyNoInteractions(alunoMapper);
-        assertEquals("Aluno com id 1 nao encontrado", exception.getMessage());
+        assertEquals("Aluno com ID 1 não encontrado.", exception.getMessage());
     }
 
     @Test
@@ -334,8 +334,8 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 1);
 
-        assertRegraDeNegocio(request, "IDADE_INVALIDA", "dataNascimento",
-                "Data de nascimento nao pode ser depois da data da matricula");
+        assertRegraDeNegocio(request, "DATA_NASCIMENTO_INVALIDA", "dataNascimento",
+                "A data de nascimento não pode ser posterior à data da matrícula.");
     }
 
     @Test
@@ -348,8 +348,8 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 1);
 
-        assertRegraDeNegocio(request, "ALUNO_MENOR_DE_IDADE", "dataNascimento",
-                "Aluno precisa ter pelo menos 18 anos");
+        assertRegraDeNegocio(request, "IDADE_MINIMA_NAO_ATENDIDA", "dataNascimento",
+                "O aluno deve ter, no mínimo, 18 anos na data da matrícula.");
     }
 
     @Test
@@ -362,7 +362,7 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 1);
 
-        assertRegraDeNegocio(request, "CPF_INVALIDO", "cpf", "CPF invalido");
+        assertRegraDeNegocio(request, "CPF_INVALIDO", "cpf", "O CPF informado é inválido.");
     }
 
     @Test
@@ -375,7 +375,7 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 1);
 
-        assertRegraDeNegocio(request, "CEP_INVALIDO", "cep", "CEP invalido");
+        assertRegraDeNegocio(request, "CEP_INVALIDO", "cep", "O CEP informado é inválido.");
     }
 
     @Test
@@ -388,7 +388,7 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 3);
 
-        assertRegraDeNegocio(request, "SEMESTRE_INVALIDO", "semestre", "Semestre deve ser 1 ou 2");
+        assertRegraDeNegocio(request, "SEMESTRE_INVALIDO", "semestre", "O semestre informado deve ser 1 ou 2.");
     }
 
     @Test
@@ -401,7 +401,7 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 2, 10),
                 null);
 
-        assertRegraDeNegocio(request, "SEMESTRE_INVALIDO", "semestre", "Semestre deve ser 1 ou 2");
+        assertRegraDeNegocio(request, "SEMESTRE_INVALIDO", "semestre", "O semestre informado deve ser 1 ou 2.");
     }
 
     @Test
@@ -414,8 +414,8 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 4, 10),
                 1);
 
-        assertRegraDeNegocio(request, "PRAZO_MATRICULA_1_SEMESTRE_ENCERRADO", "dataMatricula",
-                "Matricula do primeiro semestre so pode ser feita ate marco");
+        assertRegraDeNegocio(request, "PRAZO_PRIMEIRO_SEMESTRE_ENCERRADO", "dataMatricula",
+                "A matrícula do primeiro semestre deve ser realizada até março.");
     }
 
     @Test
@@ -428,13 +428,13 @@ class AlunoServiceImplTest {
                 LocalDate.of(2026, 10, 10),
                 2);
 
-        assertRegraDeNegocio(request, "PRAZO_MATRICULA_2_SEMESTRE_ENCERRADO", "dataMatricula",
-                "Matricula do segundo semestre so pode ser feita ate setembro");
+        assertRegraDeNegocio(request, "PRAZO_SEGUNDO_SEMESTRE_ENCERRADO", "dataMatricula",
+                "A matrícula do segundo semestre deve ser realizada até setembro.");
     }
 
     private void assertRegraDeNegocio(AlunoRequest request, String codigo, String campo, String mensagem) {
-        RegraDeNegocioException exception = assertThrows(
-                RegraDeNegocioException.class,
+        ViolacaoRegraDeNegocioException exception = assertThrows(
+                ViolacaoRegraDeNegocioException.class,
                 () -> alunoService.cadastrar(request));
 
         verifyNoInteractions(alunoRepository, alunoMapper);

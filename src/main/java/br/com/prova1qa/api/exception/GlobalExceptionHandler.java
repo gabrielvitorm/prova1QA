@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(RecursoNaoEncontradoException exception) {
+    @ExceptionHandler(EntidadeNaoEncontradaException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotFound(EntidadeNaoEncontradaException exception) {
         return buildResponse(HttpStatus.NOT_FOUND, "RECURSO_NAO_ENCONTRADO", exception.getMessage(), Map.of());
     }
 
-    @ExceptionHandler(RegraDeNegocioException.class)
-    public ResponseEntity<ApiErrorResponse> handleBusiness(RegraDeNegocioException exception) {
+    @ExceptionHandler(ViolacaoRegraDeNegocioException.class)
+    public ResponseEntity<ApiErrorResponse> handleBusiness(ViolacaoRegraDeNegocioException exception) {
         Map<String, String> fieldErrors = exception.getCampo() == null
                 ? Map.of()
                 : Map.of(exception.getCampo(), exception.getMessage());
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         exception.getBindingResult().getFieldErrors()
                 .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
 
-        return buildResponse(HttpStatus.BAD_REQUEST, "DADOS_INVALIDOS", "Dados invalidos para o cadastro do aluno",
+        return buildResponse(HttpStatus.BAD_REQUEST, "DADOS_INVALIDOS", "Dados inválidos para o cadastro do aluno.",
                 fieldErrors);
     }
 

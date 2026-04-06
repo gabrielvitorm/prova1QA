@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.prova1qa.api.dtos.AlunoRequest;
 import br.com.prova1qa.api.dtos.AlunoResponse;
-import br.com.prova1qa.api.exception.RecursoNaoEncontradoException;
-import br.com.prova1qa.api.exception.RegraDeNegocioException;
-import br.com.prova1qa.api.exception.RegraNegocioErro;
+import br.com.prova1qa.api.exception.EntidadeNaoEncontradaException;
+import br.com.prova1qa.api.exception.ErroRegraDeNegocio;
+import br.com.prova1qa.api.exception.ViolacaoRegraDeNegocioException;
 import br.com.prova1qa.api.mapper.AlunoMapper;
 import br.com.prova1qa.api.model.Aluno;
 import br.com.prova1qa.api.repository.AlunoRepository;
@@ -69,7 +69,7 @@ public class AlunoServiceImpl implements AlunoService {
 
     private Aluno buscarEntidade(Long id) {
         return alunoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno com id " + id + " nao encontrado"));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Aluno com ID " + id + " não encontrado."));
     }
 
     private void validarRegrasDeNegocio(AlunoRequest request) {
@@ -85,30 +85,30 @@ public class AlunoServiceImpl implements AlunoService {
 
     private void validarMaioridade(AlunoRequest request) {
         if (request.dataNascimento().isAfter(request.dataMatricula())) {
-            throw new RegraDeNegocioException(RegraNegocioErro.IDADE_INVALIDA);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.DATA_NASCIMENTO_INVALIDA);
         }
 
         int idade = Period.between(request.dataNascimento(), request.dataMatricula()).getYears();
         if (idade < 18) {
-            throw new RegraDeNegocioException(RegraNegocioErro.ALUNO_MENOR_DE_IDADE);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.IDADE_MINIMA_NAO_ATENDIDA);
         }
     }
 
     private void validarCpf(String cpf) {
         if (cpf.length() != 11 || cpf.chars().distinct().count() == 1 || !cpfValido(cpf)) {
-            throw new RegraDeNegocioException(RegraNegocioErro.CPF_INVALIDO);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.CPF_INVALIDO);
         }
     }
 
     private void validarCep(String cep) {
         if (cep.length() != 8) {
-            throw new RegraDeNegocioException(RegraNegocioErro.CEP_INVALIDO);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.CEP_INVALIDO);
         }
     }
 
     private void validarSemestre(Integer semestre) {
         if (semestre == null || (semestre != 1 && semestre != 2)) {
-            throw new RegraDeNegocioException(RegraNegocioErro.SEMESTRE_INVALIDO);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.SEMESTRE_INVALIDO);
         }
     }
 
@@ -117,11 +117,11 @@ public class AlunoServiceImpl implements AlunoService {
         Integer semestre = request.semestre();
 
         if (semestre == 1 && mesAtual > 3) {
-            throw new RegraDeNegocioException(RegraNegocioErro.PRAZO_MATRICULA_1_SEMESTRE_ENCERRADO);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.PRAZO_PRIMEIRO_SEMESTRE_ENCERRADO);
         }
 
         if (semestre == 2 && mesAtual > 9) {
-            throw new RegraDeNegocioException(RegraNegocioErro.PRAZO_MATRICULA_2_SEMESTRE_ENCERRADO);
+            throw new ViolacaoRegraDeNegocioException(ErroRegraDeNegocio.PRAZO_SEGUNDO_SEMESTRE_ENCERRADO);
         }
     }
 
