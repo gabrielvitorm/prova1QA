@@ -67,6 +67,44 @@ docker compose up -d
 .\mvnw.cmd -Dtest=AlunoServiceImplTest test
 ```
 
+## Cobertura de Testes com JaCoCo
+
+O relatório de cobertura foi gerado com JaCoCo, considerando o escopo da prova focado em testes unitários da camada de serviço.
+
+### Gerar o relatório
+
+```powershell
+.\mvnw.cmd clean verify
+```
+
+### Localização do relatório HTML
+
+```text
+target/site/jacoco/index.html
+```
+
+### Resumo da cobertura gerada
+
+- Cobertura de instruções: `98%`
+- Cobertura de desvios: `85%`
+- Cobertura de linhas: `57/57`
+- Cobertura de métodos: `16/16`
+- Cobertura de classes: `1/1`
+
+### Evidências do relatório
+
+#### Visão geral do relatório
+
+![Resumo do relatório JaCoCo](docs/jacoco-resumo.png)
+
+#### Detalhamento da classe avaliada
+
+![Cobertura da classe AlunoServiceImpl](docs/jacoco-classe.png)
+
+#### Cobertura por linha do código-fonte
+
+![Cobertura por linha do AlunoServiceImpl](docs/jacoco-fonte.png)
+
 ## Estratégia de Testes
 
 Para atender ao escopo da avaliação, o projeto foi mantido exclusivamente com testes unitários.
