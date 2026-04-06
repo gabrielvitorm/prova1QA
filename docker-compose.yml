@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: prova_1_qa
+    restart: always
+    environment:
+      POSTGRES_DB: prova_1_qa_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
